@@ -14,10 +14,9 @@ enum OnboardingStep: Int, CaseIterable {
     case sessions = 1
     case raceDate = 2
     case lastRace = 3
-    case pace = 4
-    case heartRate = 5
-    case summary = 6
-    case generating = 7
+    case heartRate = 4
+    case summary = 5
+    case generating = 6
 
     var title: String {
         switch self {
@@ -25,7 +24,6 @@ enum OnboardingStep: Int, CaseIterable {
         case .sessions: return "Sesiones por Semana"
         case .raceDate: return "Fecha de tu Carrera"
         case .lastRace: return "Tu Última Carrera"
-        case .pace: return "Ritmo Actual"
         case .heartRate: return "FC Máxima"
         case .summary: return "Todo Listo!"
         case .generating: return "Generando Plan"
@@ -39,9 +37,8 @@ enum OnboardingStep: Int, CaseIterable {
         case .sessions: return 1
         case .raceDate: return 2
         case .lastRace: return 3
-        case .pace: return 4
-        case .heartRate: return 5
-        case .summary: return 6
+        case .heartRate: return 4
+        case .summary: return 5
         }
     }
 }
@@ -95,8 +92,10 @@ class OnboardingViewModel {
         case .raceDate:
             currentStep = .lastRace
         case .lastRace:
-            currentStep = .pace
-        case .pace:
+            // Sincronizar el ritmo actual con el ritmo de la última carrera
+            if hasRecentRace {
+                currentPaceMinPerKm = lastRacePaceMinPerKm
+            }
             currentStep = .heartRate
         case .heartRate:
             currentStep = .summary
@@ -118,10 +117,8 @@ class OnboardingViewModel {
             currentStep = .sessions
         case .lastRace:
             currentStep = .raceDate
-        case .pace:
-            currentStep = .lastRace
         case .heartRate:
-            currentStep = .pace
+            currentStep = .lastRace
         case .summary:
             currentStep = .heartRate
         case .generating:
@@ -153,12 +150,12 @@ class OnboardingViewModel {
     }
 
     var isLastRaceValid: Bool {
-        // Siempre válido porque es opcional (puede elegir "Ninguna")
-        if !hasRecentRace {
-            return true
-        }
         // Si tiene carrera reciente, validar los datos
-        return lastRaceDistance > 0 && lastRacePaceMinPerKm >= 3.0 && lastRacePaceMinPerKm <= 10.0
+        if hasRecentRace {
+            return lastRaceDistance > 0 && lastRacePaceMinPerKm >= 3.0 && lastRacePaceMinPerKm <= 10.0
+        }
+        // Si NO tiene carrera reciente, debe tener un ritmo objetivo válido
+        return currentPaceMinPerKm >= 3.0 && currentPaceMinPerKm <= 10.0
     }
 
     var canContinueFromCurrentStep: Bool {
@@ -167,7 +164,6 @@ class OnboardingViewModel {
         case .sessions: return isSessionsValid
         case .raceDate: return isRaceDateValid
         case .lastRace: return isLastRaceValid
-        case .pace: return isPaceValid
         case .heartRate: return isHeartRateValid
         case .summary: return isSessionsValid && isRaceDateValid && isLastRaceValid && isPaceValid && isHeartRateValid
         case .generating: return false

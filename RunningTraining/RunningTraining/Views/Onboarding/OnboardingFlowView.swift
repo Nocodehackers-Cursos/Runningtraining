@@ -54,14 +54,6 @@ struct OnboardingFlowView: View {
                             updateNavigation()
                         }
 
-                case .pace:
-                    PaceInputView(viewModel: viewModel)
-                        .transition(slideTransition)
-                        .id("pace")
-                        .onAppear {
-                            updateNavigation()
-                        }
-
                 case .heartRate:
                     HeartRateInputView(viewModel: viewModel)
                         .transition(slideTransition)
