@@ -81,43 +81,43 @@ struct LastRaceInputView: View {
                             }
 
                             // Selector de ritmo de la carrera
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 12) {
                                 Text("Ritmo promedio de la carrera")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(AppTheme.textSecondary)
 
-                                HStack {
+                                VStack(spacing: 16) {
+                                    // Display del valor actual
                                     Text(PaceFormatter.format(
                                         paceMinPerKm: viewModel.lastRacePaceMinPerKm,
                                         useMetric: true
                                     ))
-                                        .font(.system(size: 32, weight: .bold))
+                                        .font(.system(size: 48, weight: .bold))
                                         .foregroundColor(AppTheme.primary)
 
-                                    Spacer()
-
+                                    // Slider
                                     VStack(spacing: 8) {
-                                        Button {
-                                            viewModel.lastRacePaceMinPerKm = max(3.0, viewModel.lastRacePaceMinPerKm - 0.25)
-                                        } label: {
-                                            Image(systemName: "chevron.up")
-                                                .font(.title3)
-                                                .foregroundColor(AppTheme.primary)
-                                                .frame(width: 44, height: 44)
-                                                .background(AppTheme.cardBackground)
-                                                .cornerRadius(8)
-                                        }
+                                        Slider(
+                                            value: $viewModel.lastRacePaceMinPerKm,
+                                            in: 3.0...10.0,
+                                            step: 0.25
+                                        )
+                                        .tint(AppTheme.primary)
 
-                                        Button {
-                                            viewModel.lastRacePaceMinPerKm = min(10.0, viewModel.lastRacePaceMinPerKm + 0.25)
-                                        } label: {
-                                            Image(systemName: "chevron.down")
-                                                .font(.title3)
-                                                .foregroundColor(AppTheme.primary)
-                                                .frame(width: 44, height: 44)
-                                                .background(AppTheme.cardBackground)
-                                                .cornerRadius(8)
+                                        // Labels de rango
+                                        HStack {
+                                            Text("3:00")
+                                                .font(.caption)
+                                                .foregroundColor(AppTheme.textSecondary)
+                                            Spacer()
+                                            Text("Desliza para ajustar")
+                                                .font(.caption)
+                                                .foregroundColor(AppTheme.textSecondary)
+                                            Spacer()
+                                            Text("10:00")
+                                                .font(.caption)
+                                                .foregroundColor(AppTheme.textSecondary)
                                         }
                                     }
                                 }
@@ -133,43 +133,43 @@ struct LastRaceInputView: View {
                     } else {
                         // Selector de ritmo objetivo cuando NO ha corrido recientemente
                         VStack(spacing: 20) {
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 12) {
                                 Text("¿Cuál es tu ritmo objetivo?")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(AppTheme.textSecondary)
 
-                                HStack {
+                                VStack(spacing: 16) {
+                                    // Display del valor actual
                                     Text(PaceFormatter.format(
                                         paceMinPerKm: viewModel.currentPaceMinPerKm,
                                         useMetric: true
                                     ))
-                                        .font(.system(size: 32, weight: .bold))
+                                        .font(.system(size: 48, weight: .bold))
                                         .foregroundColor(AppTheme.primary)
 
-                                    Spacer()
-
+                                    // Slider
                                     VStack(spacing: 8) {
-                                        Button {
-                                            viewModel.currentPaceMinPerKm = max(3.0, viewModel.currentPaceMinPerKm - 0.25)
-                                        } label: {
-                                            Image(systemName: "chevron.up")
-                                                .font(.title3)
-                                                .foregroundColor(AppTheme.primary)
-                                                .frame(width: 44, height: 44)
-                                                .background(AppTheme.cardBackground)
-                                                .cornerRadius(8)
-                                        }
+                                        Slider(
+                                            value: $viewModel.currentPaceMinPerKm,
+                                            in: 3.0...10.0,
+                                            step: 0.25
+                                        )
+                                        .tint(AppTheme.primary)
 
-                                        Button {
-                                            viewModel.currentPaceMinPerKm = min(10.0, viewModel.currentPaceMinPerKm + 0.25)
-                                        } label: {
-                                            Image(systemName: "chevron.down")
-                                                .font(.title3)
-                                                .foregroundColor(AppTheme.primary)
-                                                .frame(width: 44, height: 44)
-                                                .background(AppTheme.cardBackground)
-                                                .cornerRadius(8)
+                                        // Labels de rango
+                                        HStack {
+                                            Text("3:00")
+                                                .font(.caption)
+                                                .foregroundColor(AppTheme.textSecondary)
+                                            Spacer()
+                                            Text("Desliza para ajustar")
+                                                .font(.caption)
+                                                .foregroundColor(AppTheme.textSecondary)
+                                            Spacer()
+                                            Text("10:00")
+                                                .font(.caption)
+                                                .foregroundColor(AppTheme.textSecondary)
                                         }
                                     }
                                 }

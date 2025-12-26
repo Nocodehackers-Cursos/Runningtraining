@@ -10,16 +10,9 @@ import SwiftUI
 /// Vista para ingresar FC máxima
 struct HeartRateInputView: View {
     @Bindable var viewModel: OnboardingViewModel
-    @State private var hrText: String = ""
-    @FocusState private var isTextFieldFocused: Bool
 
     private var isValid: Bool {
         viewModel.maxHeartRate >= 140 && viewModel.maxHeartRate <= 220
-    }
-
-    private var suggestedHR: Int {
-        // Fórmula simple: 220 - edad promedio (40 años)
-        180
     }
 
     var body: some View {
@@ -27,40 +20,55 @@ struct HeartRateInputView: View {
             stepNumber: 4,
             totalSteps: 5,
             title: "¿Tu FC máxima?",
-            subtitle: "Introduce tu frecuencia cardíaca máxima",
+            subtitle: "Selecciona tu frecuencia cardíaca máxima",
             icon: "heart.fill",
             content: {
                 VStack(spacing: 24) {
-                    // Input de FC
-                    VStack(spacing: 12) {
-                        // TextField para valor numérico
-                        TextField("180", text: $hrText)
-                            .keyboardType(.numberPad)
-                            .font(.system(size: 48, weight: .bold))
-                            .foregroundColor(AppTheme.primary)
-                            .multilineTextAlignment(.center)
-                            .focused($isTextFieldFocused)
-                            .onChange(of: hrText) { oldValue, newValue in
-                                // Actualizar viewModel
-                                if let hr = Int(newValue) {
-                                    viewModel.maxHeartRate = hr
-                                }
-                            }
-                            .onAppear {
-                                hrText = "\(viewModel.maxHeartRate)"
+                    // Slider de FC
+                    VStack(alignment: .leading, spacing: 12) {
+                        VStack(spacing: 16) {
+                            // Display del valor actual
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Text("\(viewModel.maxHeartRate)")
+                                    .font(.system(size: 64, weight: .bold))
+                                    .foregroundColor(AppTheme.primary)
+
+                                Text("bpm")
+                                    .font(.title2)
+                                    .foregroundColor(AppTheme.textSecondary)
                             }
 
-                        Text("bpm")
-                            .font(.title3)
-                            .foregroundColor(AppTheme.textSecondary)
-                    }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(AppTheme.cardBackground)
-                    )
-                    .onTapGesture {
-                        isTextFieldFocused = true
+                            // Slider
+                            VStack(spacing: 8) {
+                                Slider(
+                                    value: Binding(
+                                        get: { Double(viewModel.maxHeartRate) },
+                                        set: { viewModel.maxHeartRate = Int($0) }
+                                    ),
+                                    in: 140...220,
+                                    step: 1
+                                )
+                                .tint(AppTheme.primary)
+
+                                // Labels de rango
+                                HStack {
+                                    Text("140")
+                                        .font(.caption)
+                                        .foregroundColor(AppTheme.textSecondary)
+                                    Spacer()
+                                    Text("Desliza para ajustar")
+                                        .font(.caption)
+                                        .foregroundColor(AppTheme.textSecondary)
+                                    Spacer()
+                                    Text("220")
+                                        .font(.caption)
+                                        .foregroundColor(AppTheme.textSecondary)
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(AppTheme.cardBackground)
+                        .cornerRadius(12)
                     }
 
                     // Sugerencia calculada
@@ -88,11 +96,9 @@ struct HeartRateInputView: View {
                 }
             },
             onContinue: {
-                isTextFieldFocused = false
                 viewModel.navigateNext()
             },
             onBack: {
-                isTextFieldFocused = false
                 viewModel.navigateBack()
             },
             isValid: viewModel.isHeartRateValid
