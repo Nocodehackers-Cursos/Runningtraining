@@ -23,7 +23,7 @@ struct LastRaceInputView: View {
     var body: some View {
         OnboardingStepContainer(
             stepNumber: 3,
-            totalSteps: 6,
+            totalSteps: 5,
             title: "¿Has corrido recientemente?",
             subtitle: "Ayúdanos a ajustar mejor tu plan",
             icon: "figure.run",
@@ -80,9 +80,9 @@ struct LastRaceInputView: View {
                                 }
                             }
 
-                            // Selector de ritmo/tiempo
+                            // Selector de ritmo de la carrera
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Ritmo promedio")
+                                Text("Ritmo promedio de la carrera")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(AppTheme.textSecondary)
@@ -131,8 +131,56 @@ struct LastRaceInputView: View {
                         }
                         .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     } else {
-                        InfoTooltip(message: "No pasa nada! Usaremos tu ritmo objetivo para crear tu plan personalizado")
-                            .transition(.opacity)
+                        // Selector de ritmo objetivo cuando NO ha corrido recientemente
+                        VStack(spacing: 20) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("¿Cuál es tu ritmo objetivo?")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(AppTheme.textSecondary)
+
+                                HStack {
+                                    Text(PaceFormatter.format(
+                                        paceMinPerKm: viewModel.currentPaceMinPerKm,
+                                        useMetric: true
+                                    ))
+                                        .font(.system(size: 32, weight: .bold))
+                                        .foregroundColor(AppTheme.primary)
+
+                                    Spacer()
+
+                                    VStack(spacing: 8) {
+                                        Button {
+                                            viewModel.currentPaceMinPerKm = max(3.0, viewModel.currentPaceMinPerKm - 0.25)
+                                        } label: {
+                                            Image(systemName: "chevron.up")
+                                                .font(.title3)
+                                                .foregroundColor(AppTheme.primary)
+                                                .frame(width: 44, height: 44)
+                                                .background(AppTheme.cardBackground)
+                                                .cornerRadius(8)
+                                        }
+
+                                        Button {
+                                            viewModel.currentPaceMinPerKm = min(10.0, viewModel.currentPaceMinPerKm + 0.25)
+                                        } label: {
+                                            Image(systemName: "chevron.down")
+                                                .font(.title3)
+                                                .foregroundColor(AppTheme.primary)
+                                                .frame(width: 44, height: 44)
+                                                .background(AppTheme.cardBackground)
+                                                .cornerRadius(8)
+                                        }
+                                    }
+                                }
+                                .padding()
+                                .background(AppTheme.cardBackground)
+                                .cornerRadius(12)
+                            }
+
+                            InfoTooltip(message: "Usaremos este ritmo como referencia para crear tu plan personalizado")
+                        }
+                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     }
                 }
             },

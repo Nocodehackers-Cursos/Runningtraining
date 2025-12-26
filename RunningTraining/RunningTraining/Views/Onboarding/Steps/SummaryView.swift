@@ -51,11 +51,11 @@ struct SummaryView: View {
                     }
 
                     EditableDataCard(
-                        title: "Ritmo actual",
+                        title: viewModel.hasRecentRace ? "Ritmo de carrera" : "Ritmo objetivo",
                         value: viewModel.formattedPace,
                         icon: "speedometer"
                     ) {
-                        viewModel.navigateToStep(.pace)
+                        viewModel.navigateToStep(.lastRace)
                     }
 
                     EditableDataCard(
