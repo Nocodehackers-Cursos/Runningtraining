@@ -100,8 +100,12 @@ class SettingsViewModel {
         do {
             _ = try await healthKitService.requestAuthorization()
 
-            // Verificar si realmente podemos acceder a los datos
-            let canAccess = await healthKitService.canAccessHealthData()
+            // IMPORTANTE: Dar tiempo a HealthKit para actualizar el estado de autorización
+            // iOS necesita unos momentos para procesar los permisos después de que el usuario los concede
+            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 segundos
+
+            // Verificar si realmente podemos acceder a los datos con reintentos
+            let canAccess = await verifyHealthKitAccessWithRetry(maxAttempts: 3)
 
             if canAccess {
                 healthKitEnabled = true
@@ -121,6 +125,29 @@ class SettingsViewModel {
             healthKitEnabled = false
             healthKitSyncStatus = nil
         }
+    }
+
+    /// Verifica el acceso a HealthKit con reintentos para manejar problemas de sincronización
+    /// - Parameter maxAttempts: Número máximo de intentos
+    /// - Returns: true si se puede acceder a HealthKit, false en caso contrario
+    private func verifyHealthKitAccessWithRetry(maxAttempts: Int) async -> Bool {
+        for attempt in 1...maxAttempts {
+            let canAccess = await healthKitService.canAccessHealthData()
+
+            if canAccess {
+                print("✅ HealthKit access verified on attempt \(attempt)")
+                return true
+            }
+
+            // Si no es el último intento, esperar antes de reintentar
+            if attempt < maxAttempts {
+                print("⚠️ HealthKit access check failed on attempt \(attempt), retrying...")
+                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 segundo entre intentos
+            }
+        }
+
+        print("❌ HealthKit access verification failed after \(maxAttempts) attempts")
+        return false
     }
 
     /// Sincroniza los últimos 30 días de entrenamientos desde HealthKit
